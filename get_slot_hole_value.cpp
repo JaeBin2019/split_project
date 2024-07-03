@@ -12,11 +12,13 @@ int main()
 
     if (type == "A")
     {
-        int web, flg;
+        int web, flg, thick_w;
         cout << "height(web) : ";
         cin >> web;
         cout << "width(flg) : ";
         cin >> flg;
+        cout << "thick_w : ";
+        cin >> thick_w;
 
         int A = web;
         int A1 = web + 30;
@@ -104,6 +106,7 @@ int main()
         printf("AA => B : %d, A1 : %d, R2 : %d, R : %d, E : %d, D1 : %d\n", B, A1, R2, R, E, D1);
         printf("AG => B : %d, A1 : %d, R : 50고정\n", B, A1);
         printf("AJ => A1 : %d, R1 : %d, R : 50고정\n", A1, R1);
+        printf("plate => 높이 : %d, 폭 : %d, R : %d\n", web - D, flg - thick_w + C + A, R);
     }
 
     if (type == "T")
