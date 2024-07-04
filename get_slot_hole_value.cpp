@@ -102,10 +102,10 @@ int main()
             E = 35;
         }
 
-        printf("AH => B : %d, A1 : %d, R2 : %d\n", B, A1, R2);
+        printf("AH => B + 40 : %d, A1 : %d, R2 : %d\n", B + 40, A1, R2);
         printf("AA => B : %d, A1 : %d, R2 : %d, R : %d, E : %d, D1 : %d\n", B, A1, R2, R, E, D1);
-        printf("AG => B : %d, A1 : %d, R : 50고정\n", B, A1);
-        printf("AJ => A1 : %d, R1 : %d, R : 50고정\n", A1, R1);
+        printf("AG => B : %d, A1 : %d, flg - thickW + 40: %d, R : 50고정\n", B, A1, flg - thick_w);
+        printf("AJ => A1 : %d, R1 : %d, flg + 40 : %d, R : 50고정\n", A1, R1, flg + 40);
         printf("plate => 높이 : %d, 폭 : %d, R : %d\n", web - D, flg - thick_w + C + A, R);
     }
 
