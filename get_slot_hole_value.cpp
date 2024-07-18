@@ -111,11 +111,13 @@ int main()
 
     if (type == "T")
     {
-        float web, face;
-        cout << "height(web) => A 의 높이 - Thick_F: ";
+        float web, face, thick_w;
+        cout << "height(web) => A 의 높이 : ";
         cin >> web;
         cout << "width(face) : ";
         cin >> face;
+        cout << "thick_w : ";
+        cin >> thick_w;
 
         float A = web;
         float B = face;
@@ -139,8 +141,10 @@ int main()
         {
             C = R = 100;
         }
+        float left = (B - thick_w) / 2;
+        float right = (B - thick_w) / 2 + thick_w;
 
-        printf("TE => B : %.1f, L : %.1f, R : 50고정\n", B, L);
+        printf("TE => left : %.2f, right : %.2f, height : %.1f\n", left + 50, right + 50, web + 50);
         printf("TG => B : %.1f, R : %.1f\n", B, R);
     }
 }
