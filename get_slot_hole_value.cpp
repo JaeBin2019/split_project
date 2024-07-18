@@ -12,7 +12,7 @@ int main()
 
     if (type == "A")
     {
-        int web, flg, thick_w;
+        float web, flg, thick_w;
         cout << "height(web) : ";
         cin >> web;
         cout << "width(flg) : ";
@@ -20,11 +20,11 @@ int main()
         cout << "thick_w : ";
         cin >> thick_w;
 
-        int A = web;
-        int A1 = web + 30;
-        int B = flg + 30;
-        int B1 = flg + 45;
-        int C, R;
+        float A = web;
+        float A1 = web + 30;
+        float B = flg + 30;
+        float B1 = flg + 45;
+        float C, R;
         if (web <= 150)
         {
             C = R = 0;
@@ -42,7 +42,7 @@ int main()
             C = R = 100;
         }
 
-        int R1;
+        float R1;
         if (web <= 200)
         {
             R1 = 0;
@@ -60,7 +60,7 @@ int main()
             R1 = 100;
         }
 
-        int D;
+        float D;
         if (web <= 250)
         {
             D = 50;
@@ -70,7 +70,7 @@ int main()
             D = 70;
         }
 
-        int R2, F;
+        float R2, F;
         if (web <= 125)
         {
             R2 = F = 30;
@@ -80,7 +80,7 @@ int main()
             R2 = F = 40;
         }
 
-        int D1;
+        float D1;
         if (web <= 125)
         {
             D1 = 30;
@@ -90,7 +90,7 @@ int main()
             D1 = 50;
         }
 
-        int E;
+        float E;
         if (web <= 125)
         {
 
@@ -102,27 +102,29 @@ int main()
             E = 35;
         }
 
-        printf("AH => B + 40 : %d, A1 : %d, R2 : %d\n", B + 40, A1, R2);
-        printf("AA => B : %d, A1 : %d, R2 : %d, R : %d, E : %d, D1 : %d\n", B, A1, R2, R, E, D1);
-        printf("AG => B : %d, A1 : %d, flg - thickW + 40: %d, R : 50고정\n", B, A1, flg - thick_w);
-        printf("AJ => A1 : %d, R1 : %d, flg + 40 : %d, R : 50고정\n", A1, R1, flg + 40);
-        printf("plate => 높이 : %d, 폭 : %d, R : %d\n", web - D, flg - thick_w + C + A, R);
+        printf("AH => B : %.1f, A1 : %.1f, R2 : %.1f\n", B, A1, R2);
+        printf("AA => B : %.1f, A1 : %.1f, R2 : %.1f, R : %.1f, E : %.1f, D1 : %.1f\n", B, A1, R2, R, E, D1);
+        printf("AG => thick_w : %.1f, B - thick_w: %.1f, A1 : %.1f, flg - thickW + 40: %.1f, R : 50고정\n", thick_w, B - thick_w, A1, flg - thick_w);
+        printf("AJ => A1 : %.1f, R1 : %.1f, flg + 40 : %.1f, R : 50고정\n", A1, R1, flg + 40);
+        printf("plate => 높이 : %.1f, 폭 : %.1f, R : %.1f\n", web - D, flg - thick_w + C + A, R);
     }
 
     if (type == "T")
     {
-        int web, face;
-        cout << "height(web) => A 의 높이 - Thick_F: ";
+        float web, face, thick_w;
+        cout << "height(web) => A 의 높이 : ";
         cin >> web;
         cout << "width(face) : ";
         cin >> face;
+        cout << "thick_w : ";
+        cin >> thick_w;
 
-        int A = web;
-        int B = face;
-        int F = face + 30;
-        int L = face + 60;
+        float A = web;
+        float B = face;
+        float F = face + 30;
+        float L = face + 60;
 
-        int C, R;
+        float C, R;
         if (web <= 250)
         {
             C = R = 0;
@@ -139,8 +141,10 @@ int main()
         {
             C = R = 100;
         }
+        float left = (B - thick_w) / 2;
+        float right = (B - thick_w) / 2 + thick_w;
 
-        printf("TE => B : %d, L : %d, R : 50고정\n", B, L);
-        printf("TG => B : %d, R : %d\n", B, R);
+        printf("TE => left : %.2f, right : %.2f, height : %.1f\n", left + 50, right + 50, web + 50);
+        printf("TG => B : %.1f, R : %.1f\n", B, R);
     }
 }
