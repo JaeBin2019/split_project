@@ -5,15 +5,17 @@ using UnityEngine;
 
 public class ObjectSpawner : MonoBehaviour
 {
-    public Vector3 cameraPosition = new Vector3(0.7f, 0.445f, 0);
-    public Vector3 cameraRotation = new Vector3(18, -90, 0);
-    public string screenshotFileName = "Assets/Screenshot/screenshot1.png";
     void Start()
     {
-        Texture2D floorTexture = Resources.Load<Texture2D>("Textures/myTexture");
-        Texture2D longiTexture = Resources.Load<Texture2D>("Textures/myTexture");
+        int floorTextureRand = Random.Range(1, 3);
+        int longiTextureRand = Random.Range(1, 3);
+        int plateTextureRand = Random.Range(1, 3);
+
+        Texture2D floorTexture = Resources.Load<Texture2D>($"Textures/floor{floorTextureRand}");
+        Texture2D realFloorTexture = Resources.Load<Texture2D>($"Textures/floor{floorTextureRand}");
+        Texture2D longiTexture = Resources.Load<Texture2D>($"Textures/longi{longiTextureRand}");
         Texture2D sloteHoleTexture = Resources.Load<Texture2D>("Textures/myTexture");
-        Texture2D plateTexture = Resources.Load<Texture2D>("Textures/myTexture");
+        Texture2D plateTexture = Resources.Load<Texture2D>($"Textures/plate{plateTextureRand}");
 
 
         Shader floorShader = Shader.Find("Custom/FloorShader");
@@ -23,7 +25,7 @@ public class ObjectSpawner : MonoBehaviour
 
         // 랜덤으로 1부터 26 사이의 숫자 선택
         // int randomIndex = Random.Range(1, 27);
-        int randomIndex = Random.Range(18, 19);
+        int randomIndex = Random.Range(1, 27);
 
         // 론지 사이 랜덤 거리 생성 / mm 로 변환
         float randomDis = Random.Range(500, 851) * 0.0005F;
@@ -54,13 +56,15 @@ public class ObjectSpawner : MonoBehaviour
         // string[] plateSuffixes = { "CP01", "CP02","CP03","CP04","CP05","CP06" };
         string[] plateSuffixes = { "CP01" };
         string randomPlateSuffix = plateSuffixes[Random.Range(0, plateSuffixes.Length)];
-        string plateFileName = $"plate_{randomIndex}_{randomPlateSuffix}";
+        // string plateFileName = $"plate_{randomIndex}_{randomPlateSuffix}";
+        string plateFileName = $"plate_18_{randomPlateSuffix}";
 
         // Resources 폴더에서 모델을 로드합니다.
         GameObject longiModel = Resources.Load<GameObject>($"longi/{longiFileName}");
         GameObject slotHoleModel = Resources.Load<GameObject>($"slot_hole/{slotHoleFileName}");
         GameObject plateModel = Resources.Load<GameObject>($"plate/{plateFileName}");
         GameObject floorModel = Resources.Load<GameObject>("floor/floor");
+        GameObject realFloorModel = Resources.Load<GameObject>("floor/real_floor");
 
         // make R hole
         makeRHole(randomIndex, randomSlotHoleSuffix, randomDis);
@@ -74,10 +78,12 @@ public class ObjectSpawner : MonoBehaviour
         Vector3 spawnSlotHole1 = new Vector3(0, 0, -randomDis);
         Vector3 spawnSlotHole2 = new Vector3(0, 0, randomDis);
 
-        Vector3 spawnPlate1 = new Vector3(0, 0, -randomDis);
-        Vector3 spawnPlate2 = new Vector3(0, 0, randomDis);
+        Vector3 spawnPlate1 = new Vector3(0.01f, 0, -randomDis);
+        Vector3 spawnPlate2 = new Vector3(0.01f, 0, randomDis);
 
         Vector3 spawnFloor = new Vector3(0, 0, 0);
+        Vector3 spawnRealFloor = new Vector3(0, 0, 0);
+
 
         // longi
         GameObject longiInstance1 = Instantiate(longiModel, spawnLongi1, Quaternion.identity);
@@ -102,10 +108,13 @@ public class ObjectSpawner : MonoBehaviour
 
         // floor
         GameObject floorInstance = Instantiate(floorModel, spawnFloor, Quaternion.identity);
+        GameObject realFloorInstance = Instantiate(realFloorModel, spawnRealFloor, Quaternion.identity);
         Material floorMaterial = new Material(floorShader);
         floorMaterial.mainTexture = floorTexture;
         ApplyMaterial(floorInstance, floorMaterial);
+        ApplyMaterial(realFloorInstance, floorMaterial);
         SetLayer(floorInstance, 0);
+        SetLayer(realFloorInstance, 6);
 
         // make plate left, right or none
         int plateChoice = Random.Range(0, 3);
@@ -126,21 +135,6 @@ public class ObjectSpawner : MonoBehaviour
             SetLayer(plateInstance2, 0);
         }
 
-        // 메인 카메라 위치와 회전 설정
-        Camera.main.transform.position = cameraPosition;
-        Camera.main.transform.eulerAngles = cameraRotation;
-        Camera.main.nearClipPlane = 0.1f;
-
-        // 스크린샷 찍기
-        TakeScreenshot();
-
-    }
-
-    void TakeScreenshot()
-    {
-        // 스크린샷을 파일로 저장
-        ScreenCapture.CaptureScreenshot(screenshotFileName);
-        // Debug.Log($"Screenshot saved to: {Application.dataPath}/{screenshotFileName}");
     }
 
     void makeRHole(int index, string sloteHoleSuffix, float dis)
