@@ -22,6 +22,7 @@ public class CameraController : MonoBehaviour
         CameraZoom();
         CameraDrag();
         CameraRotate();
+        CameraRotateWithKey();
         CameraInput();
         TakeScreenshot();
     }
@@ -35,6 +36,32 @@ public class CameraController : MonoBehaviour
             Vector3 rotateValue = new Vector3(y, x * -1, 0);
             transform.eulerAngles = transform.eulerAngles - rotateValue;
             transform.eulerAngles += rotateValue * _RotateSpeed;
+        }
+    }
+
+    void CameraRotateWithKey()
+    {
+        Vector3 rotateValue = new Vector3();
+        if (Input.GetKey(KeyCode.UpArrow))
+            rotateValue += new Vector3(-0.2f, 0, 0);
+        if (Input.GetKey(KeyCode.DownArrow))
+            rotateValue += new Vector3(0.2f, 0, 0);
+        if (Input.GetKey(KeyCode.LeftArrow))
+            rotateValue += new Vector3(0, -0.2f, 0);
+        if (Input.GetKey(KeyCode.RightArrow))
+            rotateValue += new Vector3(0, 0.2f, 0);
+
+        Vector3 p = rotateValue;
+        if (p.sqrMagnitude > 0)
+        {
+            totalRun += Time.deltaTime;
+            p = p * totalRun * 0.01f;
+
+            p.x = Mathf.Clamp(p.x, -_inputSpeed, _inputSpeed);
+            p.y = Mathf.Clamp(p.y, -_inputSpeed, _inputSpeed);
+            p.z = Mathf.Clamp(p.z, -_inputSpeed, _inputSpeed);
+
+            transform.Rotate(p);
         }
     }
 
