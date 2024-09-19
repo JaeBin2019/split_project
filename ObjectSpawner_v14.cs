@@ -24,7 +24,7 @@ public class ObjectSpawner : MonoBehaviour
     public void SpawnObjects(int longi1, int longi2, float longiDistance, string longiSuffix1, string longiSuffix2,
         int slotHoleStatus, string slotHoleSuffix1, string slotHoleSuffix2,
         int plateStatus, string plateSuffix, Quaternion plateRotation,
-        int r_holeStatus, float cameraDis, float cameraHeight, Vector3 cameraPosition, Vector3 cameraRotation)
+        int r_holeStatus, int particleStatus, float cameraDis, float cameraHeight, Vector3 cameraPosition, Vector3 cameraRotation)
     {
         // 오브젝트 생성
         var longi1Instance = new Longi(longi1, longiSuffix1, new Vector3(-100, 0, -longiDistance), Quaternion.identity);
@@ -66,7 +66,17 @@ public class ObjectSpawner : MonoBehaviour
             AddObjectToLists(plateInstance.GetGameObject());
         }
 
-
+        //용접광 생성(플레이트와 비슷하게 없는경우, 왼쪽, 오른쪽)
+        if (particleStatus == 1)
+        {
+            var particleInstance = new ParticleSphere(new Vector3(-15f, Longi.getLongiHeight(longi1) / 10f + 8f, -longiDistance - 18.5f), Quaternion.identity);
+            AddObjectToLists(particleInstance.GetGameObject());
+        }
+        else if (particleStatus == 2)
+        {
+            var particleInstance = new ParticleSphere(new Vector3(-15f, Longi.getLongiHeight(longi2) / 10f + 8f, longiDistance + 18.5f), Quaternion.identity);
+            AddObjectToLists(particleInstance.GetGameObject());
+        }
 
         if (r_holeStatus == 1)
         {
@@ -309,6 +319,33 @@ public abstract class BaseObject
         {
             SetLayer(child.gameObject, layer);
         }
+    }
+}
+
+//용접광(파티클) 클래스
+public class ParticleSphere : BaseObject
+{
+    public ParticleSphere(Vector3 position, Quaternion rotation)
+    {
+        // 구체 생성
+        instance = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        instance.transform.localScale = new Vector3(25f, 35f, 40f); //크기(타원형)
+        instance.transform.position = position; //위치 조정
+
+        // 쉐이더 설정
+        Material material = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));
+        material.EnableKeyword("_EMISSION");
+        material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.None; //Emission 체크박스에 체크
+        material.SetColor("_EmissionColor", new Vector4(25f / 255f, 70f / 255f, 255f / 255f, 1f) * 20f); // RGB값과 Intensity 설정, 곱하는 값이 Intensity
+
+        // 그림자 설정
+        Renderer renderer = instance.GetComponent<Renderer>();
+        if (renderer != null)
+        {
+            renderer.shadowCastingMode = ShadowCastingMode.Off; // 그림자 비활성화
+            renderer.material = material; // 새로 생성한 머티리얼 적용
+        }
+        SetLayer(instance, 6);
     }
 }
 
