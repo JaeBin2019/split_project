@@ -53,82 +53,88 @@ public class CameraScript : MonoBehaviour
             string[] chosenPlateSuffixes = selectedPlateSuffixes.ToArray();
             string[] chosenSlotHoleSuffixes = selectedSlotHoleSuffixesList.ToArray();
 
-            foreach (string plateSuffix in chosenPlateSuffixes)
+            float longiDistance = Random.Range(500, 851) * 0.05F;
+
+            // public void SpawnObjects(int longi1, int longi2, float longiDistance, string longiSuffix1, string longiSuffix2,
+            // int slotHoleStatus, string slotHoleSuffix1, string slotHoleSuffix2,
+            // int plateStatus, string plateSuffix, Quaternion plateRotation,
+            // int r_holeStatus)
+
+            // ObjectSpawner에 파라미터 전달하여 오브젝트 생성
+
+            string slotHoleSuffix = "";
+            string plateSuffix = "CP02";
+            Longi1 = 16;
+            Longi2 = 16;
+            int plateStatus = 0;
+            int slotHoleStatus = 0;
+            int r_holeStatus = 3;
+
+            Quaternion plateRotation = Quaternion.identity;
+
+            if (plateStatus == 2)
+                plateRotation = Quaternion.Euler(0, 180, 0);
+
+
+            // 카메라 위치와 회전 설정
+            // 카메라의 기본 높이 설정
+            float cameraHeight = 44.5f;
+
+            // 론지 값에 따른 카메라 높이 조정
+            if ((Longi1 >= 1 && Longi1 <= 7) || (Longi1 >= 20 && Longi1 <= 26))
             {
-                foreach (string slotHoleSuffix in chosenSlotHoleSuffixes)
-                {
-                    float longiDistance = Random.Range(500, 851) * 0.05F;
-
-                    // public void SpawnObjects(int longi1, int longi2, float longiDistance, string longiSuffix1, string longiSuffix2,
-                    // string slotHoleSuffix1, string slotHoleSuffix2,
-                    // int plateStatus, string plateSuffix, Quaternion plateRotation)
-
-                    // ObjectSpawner에 파라미터 전달하여 오브젝트 생성
-                    int plateStatus = Random.Range(1, 3);
-
-                    Quaternion plateRotation = Quaternion.identity;
-
-                    if (plateStatus == 2)
-                        plateRotation = Quaternion.Euler(0, 180, 0);
-
-                    objectSpawner.SpawnObjects(Longi1, Longi2, longiDistance, longiSuffix1, longiSuffix2,
-                    slotHoleSuffix, slotHoleSuffix,
-                    plateStatus, plateSuffix, plateRotation);
-
-                    // 카메라 위치 설정
-                    SetCameraPosition(Longi1);
-
-                    // 스크린샷 찍기
-                    yield return new WaitForSeconds(delayBeforeScreenshot);
-                    string screenshotFilePath = TakeScreenshot(Longi1, Longi2, longiSuffix1, longiSuffix2, slotHoleSuffix, plateSuffix);
-                    Debug.Log($"Screenshot saved to: {screenshotFilePath}");
-
-                    // 오브젝트 라벨링
-                    if (objectLabeler != null)
-                    {
-                        objectLabeler.LabelObjects(screenshotFilePath);
-                    }
-                    else
-                    {
-                        Debug.LogError("ObjectLabeler reference not set in CameraScript!");
-                    }
-
-                    // 텍스트 파일 생성 및 데이터 저장
-                    string textFilePath = Path.ChangeExtension(Path.Combine("Assets/parameter/", Path.GetFileName(screenshotFilePath)), ".txt");
-                    SaveDataToTxt(textFilePath, Longi1, Longi2, longiDistance, plateStatus, plateSuffix);
-
-                    // 마스크 생성 완료 후 삭제 대기
-                    yield return new WaitForSeconds(delayAfterScreenshot);
-
-                    // 생성된 오브젝트 삭제
-                    objectSpawner.DeleteSpawnedObjects();
-                }
+                cameraHeight = 25.0f;
             }
+
+            if (Longi1 >= 8 && Longi1 <= 14)
+            {
+                cameraHeight = 30.0f;
+            }
+
+            float cameraDis = Random.Range(850, 1000) * 0.1F;
+            Vector3 cameraPosition = new Vector3(cameraDis, cameraHeight, 0);
+            Vector3 cameraRotation = new Vector3(10, -90, 0);
+
+            objectSpawner.SpawnObjects(Longi1, Longi2, longiDistance, longiSuffix1, longiSuffix2,
+            slotHoleStatus, slotHoleSuffix, slotHoleSuffix,
+            plateStatus, plateSuffix, plateRotation,
+            r_holeStatus, cameraDis, cameraHeight, cameraPosition, cameraRotation);
+
+            // 카메라 위치 설정
+            SetCameraPosition(cameraDis, cameraHeight, cameraPosition, cameraRotation);
+
+            // 스크린샷 찍기
+            yield return new WaitForSeconds(delayBeforeScreenshot);
+            string screenshotFilePath = TakeScreenshot(Longi1, Longi2, longiSuffix1, longiSuffix2, slotHoleSuffix, plateSuffix);
+            Debug.Log($"Screenshot saved to: {screenshotFilePath}");
+
+            // 오브젝트 라벨링
+            if (objectLabeler != null)
+            {
+                objectLabeler.LabelObjects(screenshotFilePath);
+            }
+            else
+            {
+                Debug.LogError("ObjectLabeler reference not set in CameraScript!");
+            }
+
+            // 텍스트 파일 생성 및 데이터 저장
+            string textFilePath = Path.ChangeExtension(Path.Combine("Assets/parameter/", Path.GetFileName(screenshotFilePath)), ".txt");
+            SaveDataToTxt(textFilePath, Longi1, Longi2, longiDistance, plateStatus, plateSuffix,
+                cameraDis, cameraHeight, cameraPosition, cameraRotation);
+
+            // 마스크 생성 완료 후 삭제 대기
+            yield return new WaitForSeconds(delayAfterScreenshot);
+
+            // 생성된 오브젝트 삭제
+            objectSpawner.DeleteSpawnedObjects();
         }
 
         Debug.Log("All combinations processed.");
     }
 
-    void SetCameraPosition(int longi1)
+    void SetCameraPosition(float cameraDis, float cameraHeight, Vector3 cameraPosition, Vector3 cameraRotation)
     {
-        // 카메라의 기본 높이 설정
-        float cameraHeight = 44.5f;
-
-        // 론지 값에 따른 카메라 높이 조정
-        if ((longi1 >= 1 && longi1 <= 7) || (longi1 >= 20 && longi1 <= 26))
-        {
-            cameraHeight = 25.0f;
-        }
-
-        if (longi1 >= 8 && longi1 <= 14)
-        {
-            cameraHeight = 30.0f;
-        }
-
-        // 카메라 위치와 회전 설정
-        float randomDis = Random.Range(850, 1000) * 0.1F;
-        Vector3 cameraPosition = new Vector3(randomDis, cameraHeight, 0);
-        Vector3 cameraRotation = new Vector3(10, -90, 0);
 
         Camera.main.transform.position = cameraPosition;
         Camera.main.transform.eulerAngles = cameraRotation;
@@ -182,7 +188,8 @@ public class CameraScript : MonoBehaviour
         return filePath;
     }
 
-    void SaveDataToTxt(string filePath, int longi1, int longi2, float longiDistance, int plateStatus, string plateSuffix)
+    void SaveDataToTxt(string filePath, int longi1, int longi2, float longiDistance, int plateStatus, string plateSuffix,
+        float cameraDis, float cameraHeight, Vector3 cameraPosition, Vector3 cameraRotation)
     {
         // 파일의 디렉터리 경로를 추출
         string directory = Path.GetDirectoryName(filePath);
@@ -197,7 +204,8 @@ public class CameraScript : MonoBehaviour
         {
             // ObjectSpawner의 MakeTxt 메서드를 호출하여 데이터 작성
             // MakeTxt(StreamWriter writer, int longi1, int longi2, float longiDistance, int plateStatus, string plateSuffix)
-            objectSpawner.MakeTxt(writer, longi1, longi2, longiDistance, plateStatus, plateSuffix);
+            objectSpawner.MakeTxt(writer, longi1, longi2, longiDistance, plateStatus, plateSuffix,
+                cameraDis, cameraHeight, cameraPosition, cameraRotation);
         }
     }
 

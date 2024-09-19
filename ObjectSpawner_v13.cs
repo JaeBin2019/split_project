@@ -22,8 +22,9 @@ public class ObjectSpawner : MonoBehaviour
     }
 
     public void SpawnObjects(int longi1, int longi2, float longiDistance, string longiSuffix1, string longiSuffix2,
-        string slotHoleSuffix1, string slotHoleSuffix2,
-        int plateStatus, string plateSuffix, Quaternion plateRotation)
+        int slotHoleStatus, string slotHoleSuffix1, string slotHoleSuffix2,
+        int plateStatus, string plateSuffix, Quaternion plateRotation,
+        int r_holeStatus, float cameraDis, float cameraHeight, Vector3 cameraPosition, Vector3 cameraRotation)
     {
         // 오브젝트 생성
         var longi1Instance = new Longi(longi1, longiSuffix1, new Vector3(-100, 0, -longiDistance), Quaternion.identity);
@@ -32,11 +33,15 @@ public class ObjectSpawner : MonoBehaviour
         AddObjectToLists(longi1Instance.GetGameObject());
         AddObjectToLists(longi2Instance.GetGameObject());
 
-        var slotHole1Instance = new SlotHole(longi1, slotHoleSuffix1, new Vector3(0, 0, -longiDistance), Quaternion.identity);
-        var slotHole2Instance = new SlotHole(longi2, slotHoleSuffix2, new Vector3(0, 0, longiDistance), Quaternion.Euler(0, 180, 0));
 
-        AddObjectToLists(slotHole1Instance.GetGameObject());
-        AddObjectToLists(slotHole2Instance.GetGameObject());
+        if (slotHoleStatus == 1)
+        {
+            var slotHole1Instance = new SlotHole(longi1, slotHoleSuffix1, new Vector3(0, 0, -longiDistance), Quaternion.identity);
+            var slotHole2Instance = new SlotHole(longi2, slotHoleSuffix2, new Vector3(0, 0, longiDistance), Quaternion.Euler(0, 180, 0));
+
+            AddObjectToLists(slotHole1Instance.GetGameObject());
+            AddObjectToLists(slotHole2Instance.GetGameObject());
+        }
 
         var floorInstance = new Floor("floor", new Vector3(0, 0, 0), 0, "floor");
         var realFloorInstance = new Floor("real_floor", new Vector3(0, 0, 0), 6, "realFloor");
@@ -61,7 +66,36 @@ public class ObjectSpawner : MonoBehaviour
             AddObjectToLists(plateInstance.GetGameObject());
         }
 
-        makeRHole(longi1, slotHoleSuffix1, longiDistance, longi1Instance);
+
+
+        if (r_holeStatus == 1)
+        {
+            Vector3 spawnRHole1 = new Vector3(0, 0, -longiDistance + thick_w1);
+            var rotation1 = Quaternion.Euler(0, 0, 0);
+            var r_holeInstance1 = new RHole(longi1, longiDistance, slotHoleSuffix1, spawnRHole1, rotation1);
+            AddObjectToLists(r_holeInstance1.GetGameObject());
+        }
+
+        if (r_holeStatus == 2)
+        {
+            Vector3 spawnRHole2 = new Vector3(0, 0, longiDistance - thick_w1);
+            var rotation2 = Quaternion.Euler(0, 180, 0);
+            var r_holeInstance2 = new RHole(longi2, longiDistance, slotHoleSuffix2, spawnRHole2, rotation2);
+            AddObjectToLists(r_holeInstance2.GetGameObject());
+        }
+
+        if (r_holeStatus == 3)
+        {
+            Vector3 spawnRHole1 = new Vector3(0, 0, -longiDistance + thick_w1);
+            Vector3 spawnRHole2 = new Vector3(0, 0, longiDistance - thick_w1);
+            var rotation1 = Quaternion.Euler(0, 0, 0);
+            var rotation2 = Quaternion.Euler(0, 180, 0);
+
+            var r_holeInstance1 = new RHole(longi1, longiDistance, slotHoleSuffix1, spawnRHole1, rotation1);
+            var r_holeInstance2 = new RHole(longi2, longiDistance, slotHoleSuffix2, spawnRHole2, rotation2);
+            AddObjectToLists(r_holeInstance1.GetGameObject());
+            AddObjectToLists(r_holeInstance2.GetGameObject());
+        }
 
         // ObjectLabeler에 객체 리스트 전달
         if (objectLabeler != null)
@@ -73,15 +107,20 @@ public class ObjectSpawner : MonoBehaviour
             Debug.LogError("ObjectLabeler reference not set in ObjectSpawner!");
         }
 
-        // 텍스트 파일에 데이터를 기록
+        //  텍스트 파일에 데이터를 기록
         using (StreamWriter writer = new StreamWriter("GeneratedData.txt", true))
         {
-            MakeTxt(writer, longi1, longi2, longiDistance, plateStatus, plateSuffix);
+            MakeTxt(writer, longi1, longi2, longiDistance, plateStatus, plateSuffix,
+                cameraDis, cameraHeight, cameraPosition, cameraRotation);
         }
     }
 
-    public void MakeTxt(StreamWriter writer, int longi1, int longi2, float longiDistance, int plateStatus, string plateSuffix)
+    public void MakeTxt(StreamWriter writer, int longi1, int longi2, float longiDistance, int plateStatus, string plateSuffix,
+        float cameraDis, float cameraHeight, Vector3 cameraPosition, Vector3 cameraRotation)
     {
+        // 론지 거리에서 20을 곱해주어야 실제 값이 나옴
+        longiDistance = longiDistance * 20;
+
         // Longi (론지 관련 변수)
         int longiHeight_L = Longi.getLongiHeight(longi1); // 론지L 의 높이
         int longiHeight_R = Longi.getLongiHeight(longi2); // 론지R 의 높이
@@ -95,25 +134,48 @@ public class ObjectSpawner : MonoBehaviour
         // 필렛 (필렛 관련 변수)
         float plateWidth_L = plateStatus == 1 ? Plate.getPlateWidth(longi1, plateSuffix) : 0;
         float plateWidth_R = plateStatus == 2 ? Plate.getPlateWidth(longi2, plateSuffix) : 0;
-        float fillet_yong_jeop_jang_L = plateStatus == 1 ? plateWidth_L : longiDistance; // 필렛 좌측 용접장
-        float fillet_yong_jeop_jang_R = plateStatus == 2 ? longiDistance - plateWidth_R : longiDistance; // 필렛 우측 용접장
+        float fillet_yong_jeop_jang_L = longiDistance; // 필렛 좌측 용접장
+        float fillet_yong_jeop_jang_R = 0; // 필렛 우측 용접장
         int holeRadius = 0; // 홀 반지름 
 
+        if (plateStatus == 0)
+        {
+            fillet_yong_jeop_jang_L = longiDistance;
+            fillet_yong_jeop_jang_R = 0;
+        }
         if (plateStatus == 1)
+        {
+            fillet_yong_jeop_jang_L = plateWidth_L;
+            fillet_yong_jeop_jang_R = longiDistance - plateWidth_L;
             holeRadius = Longi.getRadius(longiHeight_L);
+
+            if (plateSuffix == "CP02" || plateSuffix == "CP04" || plateSuffix == "CP06")
+            {
+                fillet_yong_jeop_jang_L -= Plate.getPlateHoleSize(longi1, plateSuffix);
+            }
+        }
         if (plateStatus == 2)
+        {
+            fillet_yong_jeop_jang_L = longiDistance - plateWidth_R;
+            fillet_yong_jeop_jang_R = plateWidth_R;
             holeRadius = Longi.getRadius(longiHeight_R);
+
+            if (plateSuffix == "CP02" || plateSuffix == "CP04" || plateSuffix == "CP06")
+            {
+                fillet_yong_jeop_jang_R -= Plate.getPlateHoleSize(longi2, plateSuffix);
+            }
+        }
 
         int gyeong_gye_yong_jeop_jang = 0; // 경계 용접장
 
         // 좌측 Collar
-        int collarY_L = 0; // Y 위치
+        float collarY_L = 0; // Y 위치
         int collarHeight_L = 0; // 높이
         int collarType_L = 0; // 상단 타입
         float collarSize_L = 0; // 형상 크기
 
         // 우측 Collar
-        int collarY_R = 0; // Y 위치
+        float collarY_R = 0; // Y 위치
         int collarHeight_R = 0; // 높이
         int collarType_R = 0; // 상단 타입
         float collarSize_R = 0; // 형상 크기
@@ -121,29 +183,45 @@ public class ObjectSpawner : MonoBehaviour
         if (plateStatus == 1)
         {
             // 좌측 Collar
-            collarY_L = 0; // Y 위치
+            collarY_L = longiDistance / 2 - plateWidth_L; // Y 위치
             collarHeight_L = plateHeight_L; // 높이
             collarType_L = Plate.getCollarType(plateSuffix); // 상단 타입
-            collarSize_L = plateWidth_L; // 형상 크기
+
+            if (longi1 == 1 || longi1 == 2)
+                collarSize_L = 20; // 형상 크기
+
+            else
+                collarSize_L = 30; // 형상 크기
         }
 
         if (plateStatus == 2)
         {
             // 우측 Collar
-            collarY_R = 0; // Y 위치
+            collarY_R = plateWidth_R - longiDistance / 2; // Y 위치
             collarHeight_R = plateHeight_R; // 높이
             collarType_R = Plate.getCollarType(plateSuffix); // 상단 타입
-            collarSize_R = plateWidth_R; // 형상 크기
+
+            if (longi2 == 1 || longi2 == 2)
+                collarSize_R = 20; // 형상 크기
+
+            else
+                collarSize_R = 30; // 형상 크기
         }
 
         // 데이터를 텍스트 파일에 작성
+        writer.WriteLine($"Camera Distance : {cameraDis * 10}");
+        writer.WriteLine($"Camera Height : {cameraHeight * 10}");
+        writer.WriteLine($"Camera Rotation : {cameraRotation.ToString()}");
+        writer.WriteLine($"Camera Position : {cameraPosition.ToString()}");
+
         writer.WriteLine($"Longi Height Left: {longiHeight_L}");
         writer.WriteLine($"Longi Height Right: {longiHeight_R}");
-        writer.WriteLine($"Longi Distance: {longiDistance * 10}");
+
+        writer.WriteLine($"Longi Distance: {longiDistance}");
         writer.WriteLine($"Longi Yong Jeop Jang Left: {longi_yong_jeop_jang_L}");
         writer.WriteLine($"Longi Yong Jeop Jang Right: {longi_yong_jeop_jang_R}");
-        writer.WriteLine($"Gak Jang Left: {gak_jang_L}");
-        writer.WriteLine($"Gak Jang Right: {gak_jang_R}");
+        // writer.WriteLine($"Gak Jang Left: {gak_jang_L}");
+        // writer.WriteLine($"Gak Jang Right: {gak_jang_R}");
 
         writer.WriteLine($"Fillet Yong Jeop Jang Left: {fillet_yong_jeop_jang_L}");
         writer.WriteLine($"Fillet Yong Jeop Jang Right: {fillet_yong_jeop_jang_R}");
@@ -176,39 +254,6 @@ public class ObjectSpawner : MonoBehaviour
             Destroy(obj);
         }
         spawnedObjects.Clear();
-    }
-
-    void makeRHole(int index, string slotHoleSuffix, float dis, Longi longi)
-    {
-        int r_rand = 0;
-        int radius = 0;
-        int height = Longi.getLongiHeight(index);
-        float thick_w = 0.1f * Longi.getLongiThick_w(index);
-
-        if (slotHoleSuffix == "AA" || slotHoleSuffix == "TG")
-        {
-            r_rand = UnityEngine.Random.Range(0, 2);
-            radius = Longi.getRadius(height);
-        }
-        if (slotHoleSuffix == "AJ")
-        {
-            r_rand = UnityEngine.Random.Range(0, 3);
-            radius = Longi.getRadius1(height);
-        }
-
-        if (r_rand == 0 || radius == 0)
-        {
-            return;
-        }
-
-        Vector3 spawnRHole1 = new Vector3(0, 0, dis);
-        Vector3 spawnRHole2 = new Vector3(0, 0, -dis);
-        Vector3 spawnRHole3 = new Vector3(0, 0, -dis + thick_w);
-        Vector3 spawnRHole4 = new Vector3(0, 0, dis - thick_w);
-
-        var rHoleInstance = new RHole(radius, r_rand == 1 ? spawnRHole1 : spawnRHole3, r_rand == 1 ? spawnRHole2 : spawnRHole4, Quaternion.identity, Quaternion.Euler(0, 180, 0));
-
-        AddObjectsToLists(rHoleInstance.GetInstances());
     }
 
     private void AddObjectsToLists(List<GameObject> objs)
@@ -566,21 +611,19 @@ public class Plate : BaseObject
         }
     }
 
-    public static int getPlateHoleSize(string suffix)
+    public static int getPlateHoleSize(int index, string suffix)
     {
         switch (suffix)
         {
             case "CP01":
-            case "CP02":
+            case "CP03":
+            case "CP05":
                 return 0;
 
-            case "CP03":
+            case "CP02":
             case "CP04":
-                return 1;
-
-            case "CP05":
             case "CP06":
-                return 2;
+                return getPlateHeight(index) <= 250 ? 50 : 70;
 
             default:
                 return -1;
@@ -677,43 +720,40 @@ public class Plate : BaseObject
 
 public class RHole : BaseObject
 {
-    private List<GameObject> instances = new List<GameObject>();
-
-    public RHole(int radius, Vector3 position1, Vector3 position2, Quaternion rotation1, Quaternion rotation2)
+    public RHole(int index, float dis, string slotHoleSuffix, Vector3 position, Quaternion rotation)
     {
         // 텍스처 및 쉐이더 로드
         Texture2D rHoleTexture = Resources.Load<Texture2D>("Textures/myTexture");
         Shader rHoleShader = Shader.Find("Custom/StencilMask");
+
+        int radius = 0;
+        int height = Longi.getLongiHeight(index);
+        float thick_w = 0.1f * Longi.getLongiThick_w(index);
+
+        // if (slotHoleSuffix == "AA" || slotHoleSuffix == "TG")
+        radius = Longi.getRadius(height);
+
+        if (slotHoleSuffix == "AJ")
+        {
+            radius = Longi.getRadius1(height);
+        }
 
         // 모델 로드
         GameObject model = Resources.Load<GameObject>($"r_hole/r_{radius}");
 
         if (model != null)
         {
-            GameObject instance1 = UnityEngine.Object.Instantiate(model, position1, rotation1);
-            GameObject instance2 = UnityEngine.Object.Instantiate(model, position2, rotation2);
+            instance = UnityEngine.Object.Instantiate(model, position, rotation);
 
-            instance1.transform.localScale *= 100;
-            instance2.transform.localScale *= 100;
+            instance.transform.localScale *= 100;
 
             Material rHoleMaterial = new Material(rHoleShader) { mainTexture = rHoleTexture };
             rHoleMaterial.SetInt("_StencilID", 1); // StencilID 설정
 
-            ApplyMaterial(instance1, rHoleMaterial);
-            ApplyMaterial(instance2, rHoleMaterial);
-            SetLayer(instance1, 6);
-            SetLayer(instance2, 6);
+            ApplyMaterial(instance, rHoleMaterial);
+            SetLayer(instance, 6);
 
-            instance1.tag = "r_hole";
-            instance2.tag = "r_hole";
-
-            instances.Add(instance1);
-            instances.Add(instance2);
+            instance.tag = "r_hole";
         }
-    }
-
-    public List<GameObject> GetInstances()
-    {
-        return instances;
     }
 }
