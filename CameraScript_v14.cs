@@ -99,7 +99,7 @@ public class CameraScript : MonoBehaviour
             objectSpawner.SpawnObjects(Longi1, Longi2, longiDistance, longiSuffix1, longiSuffix2,
             slotHoleStatus, slotHoleSuffix, slotHoleSuffix,
             plateStatus, plateSuffix, plateRotation,
-            r_holeStatus, cameraDis, cameraHeight, cameraPosition, cameraRotation);
+            r_holeStatus, particleStatus, cameraDis, cameraHeight, cameraPosition, cameraRotation);
 
             // 카메라 위치 설정
             SetCameraPosition(cameraDis, cameraHeight, cameraPosition, cameraRotation);
