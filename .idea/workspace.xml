@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" ENABLED="true" CONFIG_NAME="Debug" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="01a71ea9-ccd3-4387-948e-82568a52af04" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/ObjectSpawner_v6.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ObjectSpawner_v7.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ObjectSpawner_v8.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/script_with_screenshot_v1.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/script_with_screenshot_v2.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/script_with_screenshot_v3.cs" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="ProjectApplicationVersion">
+    <option name="ide" value="CLion" />
+    <option name="majorVersion" value="2023" />
+    <option name="minorVersion" value="2.1" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 0
+}]]></component>
+  <component name="ProjectId" id="2kxJSniGL6Ddfiw3r5Qfqd2N1hZ" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true"
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="01a71ea9-ccd3-4387-948e-82568a52af04" name="Changes" comment="" />
+      <created>1724219299211</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1724219299211</updated>
+    </task>
+    <servers />
+  </component>
+</project>

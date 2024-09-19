@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
 
 public class ObjectSpawner : MonoBehaviour
 {
+    public ObjectLabeler objectLabeler;  // ObjectLabeler 참조 추가
+    private List<GameObject> spawnedObjects = new List<GameObject>();
+
     void Start()
     {
         // randValues
@@ -23,18 +25,15 @@ public class ObjectSpawner : MonoBehaviour
         string[] slotHoleSuffixesT = { "TE", "TG" };
 
         // longi
-        // int Longi1 = Random.Range(1, 26);
         int Longi1 = Random.Range(1, 26);
         int Longi2 = Longi1;
 
         // 10% 확률로 Longi2를 다른 값으로 설정
         if (Random.value < 0.1f)
         {
-            // Longi2 = Random.Range(1, 26);
             Longi2 = Random.Range(1, 18);
             while (Longi2 == Longi1)
             {
-                // Longi2 = Random.Range(1, 26);
                 Longi2 = Random.Range(1, 18);
             }
         }
@@ -59,9 +58,6 @@ public class ObjectSpawner : MonoBehaviour
         string randomPlateSuffix2 = plateSuffixes[plateRandomSuffixIndex2];
 
         // plate 여부
-        // 0 : 없음
-        // 1 : 왼쪽 론지에만 생성
-        // 2 : 오른쪽 론지에만 생성
         int plateChoice = Random.Range(0, 3);
 
         // Texture 지정
@@ -104,7 +100,6 @@ public class ObjectSpawner : MonoBehaviour
         makeRHole(Longi2, randomSlotHoleSuffix2, randomDis);
 
         // 원하는 좌표에 오브젝트를 생성
-        // 1 => 1m, 1m 만큼 앞 뒤로 이동
         Vector3 spawnLongi1 = new Vector3(-100, 0, -randomDis);
         Vector3 spawnLongi2 = new Vector3(100, 0, randomDis);
 
@@ -116,92 +111,51 @@ public class ObjectSpawner : MonoBehaviour
 
         // longi
         GameObject longiInstance1 = Instantiate(longiModel1, spawnLongi1, Quaternion.identity);
-        GameObject longiInstance2 = Instantiate(longiModel2, spawnLongi2, Quaternion.Euler(0, 180, 0));
         longiInstance1.transform.localScale *= 100;
-        longiInstance2.transform.localScale *= 100;
-        Material longiMaterial = new Material(longiShader);
-        longiMaterial.mainTexture = longiTexture;
-
-        switch (longiTextureRand)
-        {
-            case 1:
-                SetTiling(longiMaterial, 2.0f, 2.0f, 0.0f, 0.06f);
-                break;
-            case 2:
-                SetTiling(longiMaterial, 2.0f, 2.0f, 0.0f, 0.0f);
-                break;
-            case 3:
-                SetTiling(longiMaterial, 2.0f, 2.0f, 0.0f, 0.0f);
-                break;
-            case 4:
-                SetTiling(longiMaterial, 2.0f, 2.2f, 0.0f, 0.0f);
-                break;
-        }
-
-        ApplyMaterial(longiInstance1, longiMaterial);
-        ApplyMaterial(longiInstance2, longiMaterial);
+        ApplyMaterial(longiInstance1, new Material(longiShader) { mainTexture = longiTexture });
         SetLayer(longiInstance1, 6);
+        longiInstance1.tag = "longi";  // 태그 설정
+        spawnedObjects.Add(longiInstance1);
+
+        GameObject longiInstance2 = Instantiate(longiModel2, spawnLongi2, Quaternion.Euler(0, 180, 0));
+        longiInstance2.transform.localScale *= 100;
+        ApplyMaterial(longiInstance2, new Material(longiShader) { mainTexture = longiTexture });
         SetLayer(longiInstance2, 6);
+        longiInstance2.tag = "longi";  // 태그 설정
+        spawnedObjects.Add(longiInstance2);
 
         // sloteHole
         GameObject slotHoleInstance1 = Instantiate(slotHoleModel1, spawnSlotHole1, Quaternion.identity);
-        GameObject slotHoleInstance2 = Instantiate(slotHoleModel2, spawnSlotHole2, Quaternion.Euler(0, 180, 0));
         slotHoleInstance1.transform.localScale *= 100;
-        slotHoleInstance2.transform.localScale *= 100;
         Material slotHoleMaterial = new Material(sloteHoleShader);
         slotHoleMaterial.mainTexture = sloteHoleTexture;
         slotHoleMaterial.SetInt("_StencilID", 1);
         ApplyMaterial(slotHoleInstance1, slotHoleMaterial);
-        ApplyMaterial(slotHoleInstance2, slotHoleMaterial);
         SetLayer(slotHoleInstance1, 6);
+        slotHoleInstance1.tag = "slotHole";  // 태그 설정
+        spawnedObjects.Add(slotHoleInstance1);
+
+        GameObject slotHoleInstance2 = Instantiate(slotHoleModel2, spawnSlotHole2, Quaternion.Euler(0, 180, 0));
+        slotHoleInstance2.transform.localScale *= 100;
+        ApplyMaterial(slotHoleInstance2, slotHoleMaterial);
         SetLayer(slotHoleInstance2, 6);
+        slotHoleInstance2.tag = "slotHole";  // 태그 설정
+        spawnedObjects.Add(slotHoleInstance2);
 
         // floor
         GameObject floorInstance = Instantiate(floorModel, spawnFloor, Quaternion.identity);
-        GameObject realFloorInstance = Instantiate(realFloorModel, spawnRealFloor, Quaternion.identity);
         floorInstance.transform.localScale *= 100;
-        realFloorInstance.transform.localScale *= 100;
-        Material floorMaterial = new Material(floorShader);
-        Material realFloorMaterial = new Material(floorShader);
-        floorMaterial.mainTexture = floorTexture;
-        realFloorMaterial.mainTexture = realFloorTexture;
-
-        switch (floorTextureRand)
-        {
-            case 1:
-                SetTiling(floorMaterial, 0.4f, 0.4f, 0.1f, 0.0f);
-                break;
-            case 2:
-                SetTiling(floorMaterial, 0.23f, 0.25f, 0.5f, 0.0f);
-                break;
-            case 3:
-                SetTiling(floorMaterial, 0.228f, 0.46f, 0.5f, 0.0f);
-                break;
-            case 4:
-                SetTiling(floorMaterial, 0.229f, 0.46f, 0.5f, 0.0f);
-                break;
-        }
-
-        switch (realFloorTextureRand)
-        {
-            case 1:
-                SetTiling(realFloorMaterial, 0.01f, 0.01f, 0.1f, 0.4f);
-                break;
-            case 2:
-                SetTiling(realFloorMaterial, 0.01f, 0.01f, 0.1f, 0.4f);
-                break;
-            case 3:
-                SetTiling(realFloorMaterial, 0.01f, 0.012f, 0.4f, 0.48f);
-                break;
-            case 4:
-                SetTiling(realFloorMaterial, 0.0125f, 0.0125f, 0.5f, 0.5f);
-                break;
-        }
-
-        ApplyMaterial(floorInstance, floorMaterial);
-        ApplyMaterial(realFloorInstance, realFloorMaterial);
+        ApplyMaterial(floorInstance, new Material(floorShader) { mainTexture = floorTexture });
         SetLayer(floorInstance, 0);
+        floorInstance.tag = "floor";  // 태그 설정
+        spawnedObjects.Add(floorInstance);
+
+        GameObject realFloorInstance = Instantiate(realFloorModel, spawnRealFloor, Quaternion.identity);
+        realFloorInstance.transform.localScale *= 100;
+        ApplyMaterial(realFloorInstance, new Material(floorShader) { mainTexture = realFloorTexture });
         SetLayer(realFloorInstance, 6);
+        realFloorInstance.tag = "realFloor";  // 태그 설정
+        spawnedObjects.Add(realFloorInstance);
 
         // plate
         float thick_w1 = 0.1f * getLongiThick_w(Longi1);
@@ -213,25 +167,7 @@ public class ObjectSpawner : MonoBehaviour
         Vector3 spawnPlate3 = new Vector3(1f, 0, randomDis);
         Vector3 spawnPlate4 = new Vector3(1f, 0, -randomDis);
 
-        Material plateMaterial = new Material(plateShader);
-
-        switch (plateTextureRand)
-        {
-            case 1:
-                SetTiling(plateMaterial, 0.34f, 0.45f, 0.0f, 0.0f);
-                break;
-            case 2:
-                SetTiling(plateMaterial, 0.34f, 0.45f, 0.0f, 0.0f);
-                break;
-            case 3:
-                SetTiling(plateMaterial, 0.33f, 0.4f, 0.0f, 0.0f);
-                break;
-            case 4:
-                SetTiling(plateMaterial, 0.3f, 0.3f, 0.0f, 0.0f);
-                break;
-        }
-
-        // plateChoice = 2;
+        Material plateMaterial = new Material(plateShader) { mainTexture = plateTexture };
 
         if (plateChoice == 1)
         {
@@ -239,48 +175,56 @@ public class ObjectSpawner : MonoBehaviour
             {
                 GameObject plateInstance1 = Instantiate(plateModel1, spawnPlate1, Quaternion.identity);
                 plateInstance1.transform.localScale *= 100;
-                plateMaterial.mainTexture = plateTexture;
                 ApplyMaterial(plateInstance1, plateMaterial);
                 SetLayer(plateInstance1, 6);
+                plateInstance1.tag = "plate";  // 태그 설정
+                spawnedObjects.Add(plateInstance1);
             }
             else if (randomSlotHoleSuffix1 == "AG")
             {
                 GameObject plateInstance1 = Instantiate(plateModel1, spawnPlate3, Quaternion.identity);
                 plateInstance1.transform.localScale *= 100;
-                plateMaterial.mainTexture = plateTexture;
                 ApplyMaterial(plateInstance1, plateMaterial);
                 SetLayer(plateInstance1, 6);
+                plateInstance1.tag = "plate";  // 태그 설정
+                spawnedObjects.Add(plateInstance1);
             }
         }
-
         else if (plateChoice == 2)
         {
             if (randomSlotHoleSuffix2 == "AH" || randomSlotHoleSuffix2 == "TE" || randomSlotHoleSuffix2 == "AA")
             {
                 GameObject plateInstance2 = Instantiate(plateModel2, spawnPlate2, Quaternion.Euler(0, 180, 0));
                 plateInstance2.transform.localScale *= 100;
-                plateMaterial.mainTexture = plateTexture;
                 ApplyMaterial(plateInstance2, plateMaterial);
                 SetLayer(plateInstance2, 6);
+                plateInstance2.tag = "plate";  // 태그 설정
+                spawnedObjects.Add(plateInstance2);
             }
             else if (randomSlotHoleSuffix2 == "AG")
             {
                 GameObject plateInstance2 = Instantiate(plateModel2, spawnPlate4, Quaternion.Euler(0, 180, 0));
                 plateInstance2.transform.localScale *= 100;
-                plateMaterial.mainTexture = plateTexture;
                 ApplyMaterial(plateInstance2, plateMaterial);
                 SetLayer(plateInstance2, 6);
+                plateInstance2.tag = "plate";  // 태그 설정
+                spawnedObjects.Add(plateInstance2);
             }
         }
 
+        // ObjectLabeler에 객체 리스트 전달
+        if (objectLabeler != null)
+        {
+            objectLabeler.objectsToLabel = spawnedObjects;
+        }
+        else
+        {
+            Debug.LogError("ObjectLabeler reference not set in ObjectSpawner!");
+        }
     }
 
     void makeRHole(int index, string sloteHoleSuffix, float dis)
     {
-        // if rand == 0 , not make
-        // if rand == 1, make left "AA", "TG"
-        // if rand == 2, make right "AJ"
-        // 2의 경우 
         int r_rand = 0;
         int radius = 0;
         int height = getLongiHeight(index);
@@ -304,19 +248,17 @@ public class ObjectSpawner : MonoBehaviour
 
         Texture2D rHoleTexture = Resources.Load<Texture2D>("Textures/myTexture");
         Shader rHoleShader = Shader.Find("Custom/StencilMask");
-        Vector3 spawnRHole1 = new Vector3(0, 0, -dis + thick_w);
-        Vector3 spawnRHole2 = new Vector3(0, 0, dis - thick_w);
-
-        Vector3 spawnRHole3 = new Vector3(0, 0, dis);
-        Vector3 spawnRHole4 = new Vector3(0, 0, -dis);
-
+        Vector3 spawnRHole1 = new Vector3(0, 0, dis);
+        Vector3 spawnRHole2 = new Vector3(0, 0, -dis);
+        Vector3 spawnRHole3 = new Vector3(0, 0, -dis + thick_w);
+        Vector3 spawnRHole4 = new Vector3(0, 0, dis - thick_w);
         GameObject rHoleModel = Resources.Load<GameObject>($"r_hole/r_{radius}");
 
         GameObject rHoleInstance1 = null;
         GameObject rHoleInstance2 = null;
+
         if (r_rand == 1)
         {
-
             rHoleInstance1 = Instantiate(rHoleModel, spawnRHole1, Quaternion.identity);
             rHoleInstance2 = Instantiate(rHoleModel, spawnRHole2, Quaternion.Euler(0, 180, 0));
         }
@@ -331,11 +273,17 @@ public class ObjectSpawner : MonoBehaviour
 
         Material rHoleMaterial = new Material(rHoleShader);
         rHoleMaterial.mainTexture = rHoleTexture;
-        rHoleMaterial.SetInt("_StencilID", 1);
+        rHoleMaterial.SetInt("_StencilID", 1);  // StencilID 설정
+
         ApplyMaterial(rHoleInstance1, rHoleMaterial);
         ApplyMaterial(rHoleInstance2, rHoleMaterial);
         SetLayer(rHoleInstance1, 6);
         SetLayer(rHoleInstance2, 6);
+
+        rHoleInstance1.tag = "r_hole";  // 태그 설정
+        rHoleInstance2.tag = "r_hole";  // 태그 설정
+        spawnedObjects.Add(rHoleInstance1);
+        spawnedObjects.Add(rHoleInstance2);
     }
 
     int getRadius(int height)
