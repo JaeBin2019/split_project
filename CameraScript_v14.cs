@@ -69,6 +69,7 @@ public class CameraScript : MonoBehaviour
             int plateStatus = 0;
             int slotHoleStatus = 0;
             int r_holeStatus = 3;
+            int particleStatus = 0;
 
             Quaternion plateRotation = Quaternion.identity;
 
@@ -83,15 +84,15 @@ public class CameraScript : MonoBehaviour
             // 론지 값에 따른 카메라 높이 조정
             if ((Longi1 >= 1 && Longi1 <= 7) || (Longi1 >= 20 && Longi1 <= 26))
             {
-                cameraHeight = 25.0f;
+                cameraHeight = 22.5f;
             }
 
             if (Longi1 >= 8 && Longi1 <= 14)
             {
-                cameraHeight = 30.0f;
+                cameraHeight = 25.0f;
             }
 
-            float cameraDis = Random.Range(850, 1000) * 0.1F;
+            float cameraDis = Random.Range(600, 750) * 0.1F;
             Vector3 cameraPosition = new Vector3(cameraDis, cameraHeight, 0);
             Vector3 cameraRotation = new Vector3(10, -90, 0);
 
@@ -168,18 +169,52 @@ public class CameraScript : MonoBehaviour
         }
 
         // 원하는 크기의 RenderTexture 생성
-        RenderTexture rt = new RenderTexture(screenshotWidth, screenshotHeight, 24);
-        Camera.main.targetTexture = rt;
-        Camera.main.Render();
+        //RenderTexture rt = new RenderTexture(screenshotWidth, screenshotHeight, 24);
+        //Camera.main.targetTexture = rt;
+        //Camera.main.Render();
 
-        RenderTexture.active = rt;
+        //RenderTexture.active = rt;
         Texture2D screenShot = new Texture2D(screenshotWidth, screenshotHeight, TextureFormat.RGB24, false);
-        screenShot.ReadPixels(new Rect(0, 0, screenshotWidth, screenshotHeight), 0, 0);
-        screenShot.Apply();
+        //screenShot.ReadPixels(new Rect(0, 0, screenshotWidth, screenshotHeight), 0, 0);
+        //screenShot.Apply();
+        //Post-Processing을 적용시킨 상태로 스크린샷 촬영(유니티포럼에서 긁어옴)
+        RenderTexture transformedRenderTexture = null;
+        RenderTexture renderTexture = RenderTexture.GetTemporary(
+            Screen.width,
+            Screen.height,
+            24,
+            RenderTextureFormat.ARGB32,
+            RenderTextureReadWrite.Default,
+            1);
 
+        ScreenCapture.CaptureScreenshotIntoRenderTexture(renderTexture);
+        transformedRenderTexture = RenderTexture.GetTemporary(
+            screenShot.width,
+            screenShot.height,
+            24,
+            RenderTextureFormat.ARGB32,
+            RenderTextureReadWrite.Default,
+            1);
+        Graphics.Blit(
+            renderTexture,
+            transformedRenderTexture,
+            new Vector2(1.0f, -1.0f),
+            new Vector2(0.0f, 1.0f));
+        RenderTexture.active = transformedRenderTexture;
+        screenShot.ReadPixels(
+            new Rect(0, 0, screenShot.width, screenShot.height),
+            0, 0);
+        RenderTexture.active = null;
+        RenderTexture.ReleaseTemporary(renderTexture);
+        if (transformedRenderTexture != null)
+        {
+            RenderTexture.ReleaseTemporary(transformedRenderTexture);
+        }
+
+        screenShot.Apply();
         Camera.main.targetTexture = null;
         RenderTexture.active = null;
-        Destroy(rt);
+        //Destroy(rt);
 
         // 파일로 저장
         byte[] bytes = screenShot.EncodeToPNG();
