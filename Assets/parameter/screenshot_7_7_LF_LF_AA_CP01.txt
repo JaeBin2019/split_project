@@ -1,0 +1,19 @@
+Longi Height Left: 150
+Longi Height Right: 150
+Longi Distance: 413.5
+Longi Yong Jeop Jang Left: 100
+Longi Yong Jeop Jang Right: 0
+Gak Jang Left: 9
+Gak Jang Right: 9
+Fillet Yong Jeop Jang Left: 185
+Fillet Yong Jeop Jang Right: 41.35
+Hole Radius: 0
+Gyeong Gye Yong Jeop Jang: 0
+Collar Y Left: 0
+Collar Height Left: 100
+Collar Type Left: 0
+Collar Size Left: 185
+Collar Y Right: 0
+Collar Height Right: 0
+Collar Type Right: 0
+Collar Size Right: 0
