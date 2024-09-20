@@ -48,7 +48,6 @@ public class ObjectSpawner : MonoBehaviour
         AddObjectToLists(realFloorInstance.GetGameObject());
 
         float thick_w1 = 0.1f * Longi.getLongiThick_w(longi1);
-        plateStatus = 0;
 
         if (plateStatus == 1)
         {
