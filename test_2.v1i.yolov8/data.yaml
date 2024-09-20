@@ -1,0 +1,13 @@
+train: /home/split/test_2.v1i.yolov8/train/images
+val: /home/split/test_2.v1i.yolov8/valid/images
+test: /home/split/test_2.v1i.yolov8/test/images
+
+nc: 7
+names: ['fillet_hole', 'fillet_yong_jeop_jang', 'longi_yong_jeop_jang', 'plate_CP01', 'plate_CP03', 'plate_CP05', 'plate_behind']
+
+roboflow:
+  workspace: project-yhqph
+  project: test_2-6wlfy
+  version: 1
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/project-yhqph/test_2-6wlfy/dataset/1
